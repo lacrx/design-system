@@ -9,6 +9,7 @@ function parseFlags(args) {
     if (args[i] === '--source' && args[i + 1]) flags.source = args[++i];
     if (args[i] === '--output' && args[i + 1]) flags.output = args[++i];
     if (args[i] === '--filename' && args[i + 1]) flags.filename = args[++i];
+    if (args[i] === '--watch' || args[i] === '-w') flags.watch = true;
   }
   return flags;
 }
@@ -21,8 +22,10 @@ try {
       break;
     }
     case 'build': {
-      const { build } = await import('../build/build.js');
-      await build(parseFlags(args));
+      const flags = parseFlags(args);
+      const { build, watchTokens } = await import('../build/build.js');
+      await build(flags);
+      if (flags.watch) watchTokens(flags);
       break;
     }
     case 'validate': {
@@ -38,6 +41,7 @@ try {
       console.log('    --source <dir>    Token source directory (default: tokens)');
       console.log('    --output <dir>    Output directory (default: dist)');
       console.log('    --filename <name> Output filename (default: tokens.css)');
+      console.log('    --watch, -w       Rebuild on token file changes');
       console.log('  validate            Check token files for schema errors');
       break;
   }

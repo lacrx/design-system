@@ -1,2 +1,2 @@
 export { createConfig } from './build/config.js';
-export { build } from './build/build.js';
+export { build, watchTokens } from './build/build.js';
