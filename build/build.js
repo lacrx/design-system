@@ -5,7 +5,8 @@ export async function build(options = {}) {
   const config = createConfig(options);
   const sd = new StyleDictionary(config);
   await sd.buildAllPlatforms();
-  console.log('Tokens built to', config.platforms.css.buildPath + 'tokens.css');
+  const dest = config.platforms.css.files[0].destination;
+  console.log('Tokens built to', config.platforms.css.buildPath + dest);
 }
 
 if (process.argv[1] && (process.argv[1].endsWith('build.js') || process.argv[1].endsWith('cli.js'))) {

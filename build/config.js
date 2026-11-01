@@ -1,4 +1,4 @@
-export function createConfig({ source = 'tokens', output = 'dist' } = {}) {
+export function createConfig({ source = 'tokens', output = 'dist', filename = 'tokens.css' } = {}) {
   return {
     source: [`${source}/**/*.json`],
     platforms: {
@@ -7,7 +7,7 @@ export function createConfig({ source = 'tokens', output = 'dist' } = {}) {
         buildPath: output.endsWith('/') ? output : `${output}/`,
         files: [
           {
-            destination: 'tokens.css',
+            destination: filename,
             format: 'css/variables',
             options: {
               outputReferences: true,
