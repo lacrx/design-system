@@ -5,9 +5,13 @@ module.exports = {
     'scale-unlimited/declaration-strict-value': [
       [
         'color',
+        'background',
         'background-color',
+        'border',
         'border-color',
         'outline-color',
+        'box-shadow',
+        'text-decoration-color',
         'fill',
         'stroke',
       ],

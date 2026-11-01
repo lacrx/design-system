@@ -4,6 +4,18 @@
   "description": "Cross-project design system: token pipeline, AI agent rules, lint enforcement",
   "type": "module",
   "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./lint/*": "./lint/*",
+    "./build/*": "./build/*"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lacrx/design-system.git"
+  },
   "bin": {
     "design-system": "./bin/cli.js"
   },

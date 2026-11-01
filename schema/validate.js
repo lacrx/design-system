@@ -2,7 +2,8 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
 const cwd = process.cwd();
-const tokensDir = join(cwd, 'tokens');
+const sourceArg = process.argv.find((a, i) => process.argv[i - 1] === '--source');
+const tokensDir = join(cwd, sourceArg || 'tokens');
 
 function validate() {
   let errors = 0;
@@ -11,7 +12,7 @@ function validate() {
   const semanticPath = join(tokensDir, 'semantic.json');
 
   if (!existsSync(primitivesPath)) {
-    console.error('Missing tokens/primitives.json');
+    console.error('Missing', primitivesPath);
     errors++;
   } else {
     const primitives = JSON.parse(readFileSync(primitivesPath, 'utf8'));
@@ -19,7 +20,7 @@ function validate() {
   }
 
   if (!existsSync(semanticPath)) {
-    console.error('Missing tokens/semantic.json');
+    console.error('Missing', semanticPath);
     errors++;
   } else {
     const semantic = JSON.parse(readFileSync(semanticPath, 'utf8'));
@@ -47,6 +48,7 @@ function validateTokenFile(obj, filename, requireReferences, path = '') {
         console.error(`${filename}: ${currentPath}.$value should be a reference (e.g. {color.blue.600}), got "${value.$value}"`);
         errors++;
       }
+      // Composite values (objects like shadow) are valid in semantic files; skip reference check
     } else if (value && typeof value === 'object') {
       errors += validateTokenFile(value, filename, requireReferences, currentPath);
     }

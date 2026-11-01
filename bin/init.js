@@ -29,11 +29,6 @@ export async function init() {
   appendDesignRules();
   addBuildScript();
 
-  const distDir = join(cwd, 'dist');
-  if (!existsSync(distDir)) {
-    mkdirSync(distDir, { recursive: true });
-  }
-
   console.log('\nDone. Next steps:');
   console.log('  1. Edit tokens/primitives.json with your color palette');
   console.log('  2. Edit tokens/semantic.json to map roles to primitives');
@@ -85,7 +80,7 @@ function addBuildScript() {
     return;
   }
 
-  pkg.scripts['build:tokens'] = 'design-system build';
+  pkg.scripts['build:tokens'] = 'npx design-system build';
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
   console.log('  Added build:tokens script to package.json');
 }
