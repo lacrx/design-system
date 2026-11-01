@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Design Token Primitives",
+  "description": "Raw design token values in W3C DTCG format. Primitives are named by what they ARE, not what they DO.",
+  "type": "object",
+  "patternProperties": {
+    "^[a-zA-Z]": {
+      "oneOf": [
+        { "$ref": "#/$defs/tokenGroup" },
+        { "$ref": "#/$defs/token" }
+      ]
+    }
+  },
+  "$defs": {
+    "token": {
+      "type": "object",
+      "required": ["$value"],
+      "properties": {
+        "$value": {},
+        "$type": {
+          "type": "string",
+          "enum": ["color", "dimension", "fontFamily", "fontWeight", "duration", "cubicBezier", "number", "shadow", "border", "transition", "gradient"]
+        },
+        "$description": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "tokenGroup": {
+      "type": "object",
+      "patternProperties": {
+        "^[^$]": {
+          "oneOf": [
+            { "$ref": "#/$defs/tokenGroup" },
+            { "$ref": "#/$defs/token" }
+          ]
+        }
+      },
+      "properties": {
+        "$type": { "type": "string" },
+        "$description": { "type": "string" }
+      }
+    }
+  }
+}

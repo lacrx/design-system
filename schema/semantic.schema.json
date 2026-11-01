@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Semantic Design Tokens",
+  "description": "Role-based tokens that reference primitives. Named by what they DO, not what they ARE. Values must be references in {group.name} format.",
+  "type": "object",
+  "patternProperties": {
+    "^[a-zA-Z]": {
+      "oneOf": [
+        { "$ref": "#/$defs/tokenGroup" },
+        { "$ref": "#/$defs/referenceToken" }
+      ]
+    }
+  },
+  "$defs": {
+    "referenceToken": {
+      "type": "object",
+      "required": ["$value"],
+      "properties": {
+        "$value": {
+          "type": "string",
+          "pattern": "^\\{.+\\}$"
+        },
+        "$type": { "type": "string" },
+        "$description": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "tokenGroup": {
+      "type": "object",
+      "patternProperties": {
+        "^[^$]": {
+          "oneOf": [
+            { "$ref": "#/$defs/tokenGroup" },
+            { "$ref": "#/$defs/referenceToken" }
+          ]
+        }
+      },
+      "properties": {
+        "$type": { "type": "string" },
+        "$description": { "type": "string" }
+      }
+    }
+  }
+}

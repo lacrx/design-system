@@ -1,0 +1,3 @@
+{
+  "extends": "@lacrx/design-system/lint/stylelint.config.cjs"
+}

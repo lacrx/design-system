@@ -1,0 +1,22 @@
+{
+  "bg": {
+    "$type": "color",
+    "primary": { "$value": "{color.neutral.0}" },
+    "inverse": { "$value": "{color.neutral.900}" }
+  },
+  "text": {
+    "$type": "color",
+    "primary":   { "$value": "{color.neutral.900}" },
+    "secondary": { "$value": "{color.neutral.700}" },
+    "muted":     { "$value": "{color.neutral.500}" },
+    "inverse":   { "$value": "{color.neutral.0}" }
+  },
+  "accent": {
+    "$type": "color",
+    "primary": { "$value": "{color.neutral.900}" }
+  },
+  "border": {
+    "$type": "color",
+    "default": { "$value": "{color.neutral.200}" }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "color": {
+    "$type": "color",
+    "neutral": {
+      "0":   { "$value": "#FFFFFF" },
+      "50":  { "$value": "#F8F8F8" },
+      "100": { "$value": "#F0F0F0" },
+      "200": { "$value": "#E2E2E2" },
+      "300": { "$value": "#C4C4C4" },
+      "500": { "$value": "#767676" },
+      "700": { "$value": "#333333" },
+      "900": { "$value": "#121212" }
+    },
+    "brand": {
+      "100": { "$value": "#E8F0FF", "$description": "Replace with your brand palette" },
+      "500": { "$value": "#3366CC" },
+      "700": { "$value": "#1A3D7C" },
+      "900": { "$value": "#0D1F3C" }
+    }
+  },
+  "space": {
+    "$type": "dimension",
+    "xs":  { "$value": "4px" },
+    "sm":  { "$value": "8px" },
+    "md":  { "$value": "16px" },
+    "lg":  { "$value": "24px" },
+    "xl":  { "$value": "32px" },
+    "2xl": { "$value": "48px" },
+    "3xl": { "$value": "64px" }
+  },
+  "fontSize": {
+    "$type": "dimension",
+    "xs":  { "$value": "0.75rem" },
+    "sm":  { "$value": "0.875rem" },
+    "base": { "$value": "1rem" },
+    "lg":  { "$value": "1.125rem" },
+    "xl":  { "$value": "1.25rem" },
+    "2xl": { "$value": "1.5rem" },
+    "3xl": { "$value": "2rem" },
+    "4xl": { "$value": "2.5rem" }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "display": { "$value": "system-ui, sans-serif", "$description": "Replace with your display typeface" },
+    "body":    { "$value": "system-ui, sans-serif", "$description": "Replace with your body typeface" }
+  },
+  "radius": {
+    "$type": "dimension",
+    "sm":   { "$value": "4px" },
+    "md":   { "$value": "8px" },
+    "lg":   { "$value": "12px" },
+    "full": { "$value": "9999px" }
+  }
+}

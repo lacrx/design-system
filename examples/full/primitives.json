@@ -1,0 +1,68 @@
+{
+  "color": {
+    "$type": "color",
+    "warm": {
+      "50":  { "$value": "#FFF8F0" },
+      "100": { "$value": "#FFE8CC" },
+      "200": { "$value": "#FFD4A3" },
+      "400": { "$value": "#E8943D" },
+      "600": { "$value": "#C46B1A" },
+      "800": { "$value": "#5B2800" },
+      "900": { "$value": "#A63D00" }
+    },
+    "neutral": {
+      "0":   { "$value": "#FFFFFF" },
+      "50":  { "$value": "#FAF9F7" },
+      "100": { "$value": "#F0EDE8" },
+      "200": { "$value": "#D4B896" },
+      "300": { "$value": "#C4A882" },
+      "500": { "$value": "#8A7D6B" },
+      "700": { "$value": "#5C5245" },
+      "900": { "$value": "#2E2820" }
+    }
+  },
+  "space": {
+    "$type": "dimension",
+    "2xs": { "$value": "2px" },
+    "xs":  { "$value": "4px" },
+    "sm":  { "$value": "8px" },
+    "md":  { "$value": "16px" },
+    "lg":  { "$value": "24px" },
+    "xl":  { "$value": "32px" },
+    "2xl": { "$value": "48px" },
+    "3xl": { "$value": "64px" },
+    "4xl": { "$value": "96px" }
+  },
+  "fontSize": {
+    "$type": "dimension",
+    "xs":  { "$value": "0.75rem" },
+    "sm":  { "$value": "0.875rem" },
+    "base": { "$value": "1rem" },
+    "lg":  { "$value": "1.125rem" },
+    "xl":  { "$value": "1.25rem" },
+    "2xl": { "$value": "1.5rem" },
+    "3xl": { "$value": "2rem" },
+    "4xl": { "$value": "2.5rem" },
+    "5xl": { "$value": "3.5rem" }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "display": { "$value": "'Instrument Serif', Georgia, serif" },
+    "body":    { "$value": "'Inter', system-ui, sans-serif" },
+    "mono":    { "$value": "'JetBrains Mono', monospace" }
+  },
+  "radius": {
+    "$type": "dimension",
+    "sm":   { "$value": "4px" },
+    "md":   { "$value": "8px" },
+    "lg":   { "$value": "12px" },
+    "xl":   { "$value": "16px" },
+    "full": { "$value": "9999px" }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "sm":  { "$value": { "offsetX": "0px", "offsetY": "1px", "blur": "2px", "spread": "0px", "color": "rgba(0,0,0,0.05)" } },
+    "md":  { "$value": { "offsetX": "0px", "offsetY": "2px", "blur": "8px", "spread": "-2px", "color": "rgba(0,0,0,0.1)" } },
+    "lg":  { "$value": { "offsetX": "0px", "offsetY": "4px", "blur": "16px", "spread": "-4px", "color": "rgba(0,0,0,0.12)" } }
+  }
+}

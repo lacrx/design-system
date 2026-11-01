@@ -1,0 +1,33 @@
+{
+  "name": "@lacrx/design-system",
+  "version": "0.1.0",
+  "description": "Cross-project design system: token pipeline, AI agent rules, lint enforcement",
+  "type": "module",
+  "main": "./index.js",
+  "bin": {
+    "design-system": "./bin/cli.js"
+  },
+  "scripts": {
+    "build": "node build/build.js",
+    "validate": "node schema/validate.js"
+  },
+  "files": [
+    "build/",
+    "bin/",
+    "lint/",
+    "schema/",
+    "templates/",
+    "index.js"
+  ],
+  "dependencies": {
+    "style-dictionary": "^4.2.0"
+  },
+  "peerDependencies": {
+    "stylelint": ">=16.0.0",
+    "stylelint-declaration-strict-value": ">=1.10.0"
+  },
+  "peerDependenciesMeta": {
+    "stylelint": { "optional": true },
+    "stylelint-declaration-strict-value": { "optional": true }
+  }
+}

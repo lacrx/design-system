@@ -1,0 +1,28 @@
+{
+  "bg": {
+    "$type": "color",
+    "primary":   { "$value": "{color.warm.100}", "$description": "Main page background" },
+    "secondary": { "$value": "{color.warm.50}", "$description": "Card surfaces" },
+    "inverse":   { "$value": "{color.warm.800}", "$description": "Dark sections" },
+    "accent":    { "$value": "{color.warm.200}", "$description": "Highlights, callouts" }
+  },
+  "text": {
+    "$type": "color",
+    "primary":   { "$value": "{color.warm.800}", "$description": "Body text" },
+    "secondary": { "$value": "{color.warm.900}", "$description": "Headings, emphasis" },
+    "muted":     { "$value": "{color.neutral.500}", "$description": "Captions" },
+    "inverse":   { "$value": "{color.warm.100}", "$description": "Text on dark surfaces" },
+    "accent":    { "$value": "{color.warm.900}", "$description": "Links" }
+  },
+  "accent": {
+    "$type": "color",
+    "primary":   { "$value": "{color.warm.900}", "$description": "Buttons" },
+    "hover":     { "$value": "{color.warm.800}", "$description": "Button hover" },
+    "subtle":    { "$value": "{color.warm.200}", "$description": "Tags, soft highlights" }
+  },
+  "border": {
+    "$type": "color",
+    "default":   { "$value": "{color.neutral.200}", "$description": "Dividers" },
+    "strong":    { "$value": "{color.neutral.300}", "$description": "Emphasized borders" }
+  }
+}
