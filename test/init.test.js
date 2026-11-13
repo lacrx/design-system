@@ -41,6 +41,13 @@ test('wires the dependency the scaffolded config needs to resolve', () => {
     // .stylelintrc.json extends the package by name, so without this entry
     // stylelint cannot resolve its config.
     assert.ok(pkg.devDependencies?.[PKG_NAME], 'dependency not added');
+    // An unpinned spec means two projects scaffolded weeks apart get different
+    // builds, and the github: shorthand makes npm record an ssh URL.
+    assert.match(
+      pkg.devDependencies[PKG_NAME],
+      /^https:\/\/github\.com\/lacrx\/design-system\/archive\/refs\/tags\/v\d+\.\d+\.\d+\.tar\.gz$/,
+      'scaffolded spec must be a pinned tarball',
+    );
     assert.equal(readJson(project.dir, '.stylelintrc.json').extends, `${PKG_NAME}/lint/stylelint.config.cjs`);
 
     assert.equal(pkg.scripts['build:tokens'], 'design-system build --js');
@@ -139,7 +146,7 @@ test('still scaffolds when there is no package.json to wire', () => {
     const result = runCli(project.dir, ['init']);
     assert.equal(result.status, 0, result.stderr);
     assert.ok(existsSync(join(project.dir, 'tokens', 'primitives.json')));
-    assert.match(result.stdout, /npm install --save-dev github:lacrx\/design-system/);
+    assert.match(result.stdout, /npm install --save-dev https:\/\/github\.com\/lacrx\/design-system\/archive\/refs\/tags\/v\d+\.\d+\.\d+\.tar\.gz/);
   } finally {
     project.cleanup();
   }

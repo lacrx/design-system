@@ -41,8 +41,12 @@ Style Dictionary `^5` is a hard floor: on 4.x a spec-conformant dimension compil
 ## Peer dependencies
 Stylelint and `stylelint-declaration-strict-value` are optional peers, so a consumer installing this package gets neither. `bin/init.js` adds them to the consuming project itself, with ranges derived from our own `peerDependencies`, so a scaffolded project can lint without anything installed by hand. `test/init.test.js` asserts every peer is wired.
 
-## Not on npm
-Installed from GitHub (`github:lacrx/design-system`). `bin/init.js` writes that spec into the consuming project's devDependencies; if the package is ever published, change `PACKAGE_SPEC` there.
+## Not on npm, and releases are tagged
+Installed from a release tarball: `https://github.com/lacrx/design-system/archive/refs/tags/v<version>.tar.gz`. `bin/init.js` builds that spec from its own `pkg.version`, so **a release is three steps that must stay in sync**: bump `version` in package.json, merge, then tag the merge commit `v<version>` and push the tag. Until the tag exists the scaffolded spec 404s.
+
+Not the `github:lacrx/design-system` shorthand: it has no ref, so a fresh install with no lockfile floats on the default branch, and npm records `git+ssh://` in the lockfile even when asked for https, which makes `npm ci` need SSH for a public repo. Both measured, not assumed.
+
+If the package is ever published to npm, `PACKAGE_SPEC` becomes a plain version range.
 
 ## Stylelint plugin gotchas
 `stylelint-declaration-strict-value` v1.10.x documents regex keys for the `ignoreValues` and `ignoreFunctions` hashes, but they never match; use a flat array or exact property keys. Custom messages interpolate `${property}`, `${value}` and `${types}`, not `{{ property }}`.

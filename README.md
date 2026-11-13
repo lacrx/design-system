@@ -9,11 +9,17 @@ data and what happens to it, nothing about how it looks.
 
 ## Install
 
-The package is not published to npm. Install it from GitHub:
+The package is not published to npm. Install it from a release tarball:
 
 ```sh
-npm install --save-dev github:lacrx/design-system
+npm install --save-dev https://github.com/lacrx/design-system/archive/refs/tags/v0.2.0.tar.gz
 ```
+
+Not `github:lacrx/design-system`: that form has no ref, so a fresh install
+with no lockfile takes whatever `main` is at that moment, and npm records
+`git+ssh://git@github.com/...` in the lockfile even when asked for https, so
+`npm ci` then needs SSH access to a public repo. `init` writes the pinned
+tarball for you.
 
 Requires Node 20 or newer. The `--watch` flag uses recursive `fs.watch`, which
 Linux only supports from Node 20.
