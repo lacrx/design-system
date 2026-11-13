@@ -15,6 +15,17 @@ const pkg = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'));
 const PACKAGE_NAME = pkg.name;
 const PACKAGE_SPEC = 'github:lacrx/design-system';
 
+// Stylelint and its plugin are optional peers of this package, so installing
+// it brings neither. The scaffolded .stylelintrc.json is useless without them,
+// so init puts them in the consuming project directly. Ranges come from our
+// own peerDependencies, which stay the single source of truth.
+const LINT_DEPENDENCIES = Object.fromEntries(
+  Object.entries(pkg.peerDependencies || {}).map(([name, range]) => [
+    name,
+    range.replace(/^>=/, '^'),
+  ]),
+);
+
 export async function init() {
   console.log('Initializing design system...\n');
 
@@ -36,12 +47,14 @@ export async function init() {
   if (wired) {
     console.log(`  ${step++}. Run: npm install    (pulls in ${PACKAGE_NAME})`);
   } else {
-    console.log(`  ${step++}. Run: npm install --save-dev ${PACKAGE_SPEC}`);
+    const specs = [PACKAGE_SPEC, ...Object.keys(LINT_DEPENDENCIES)].join(' ');
+    console.log(`  ${step++}. Run: npm install --save-dev ${specs}`);
   }
   console.log(`  ${step++}. Edit tokens/primitives.json with your color palette`);
   console.log(`  ${step++}. Edit tokens/semantic.json to map roles to primitives`);
   console.log(`  ${step++}. Fill in DESIGN.md with your visual direction`);
   console.log(`  ${step++}. Run: npm run build:tokens`);
+  console.log(`  ${step++}. Run: npm run lint:css`);
 }
 
 function copyTemplate(name, dest, label = name) {
@@ -87,23 +100,26 @@ function updatePackageJson() {
   const project = JSON.parse(readFileSync(pkgPath, 'utf8'));
   let changed = false;
 
-  const installed =
-    project.dependencies?.[PACKAGE_NAME] || project.devDependencies?.[PACKAGE_NAME];
-
-  if (installed) {
-    console.log(`  ${PACKAGE_NAME} already a dependency`);
-  } else {
+  for (const [name, spec] of [[PACKAGE_NAME, PACKAGE_SPEC], ...Object.entries(LINT_DEPENDENCIES)]) {
+    if (project.dependencies?.[name] || project.devDependencies?.[name]) {
+      console.log(`  ${name} already a dependency`);
+      continue;
+    }
     project.devDependencies = project.devDependencies || {};
-    project.devDependencies[PACKAGE_NAME] = PACKAGE_SPEC;
-    project.devDependencies = sortKeys(project.devDependencies);
-    console.log(`  Added ${PACKAGE_NAME} to devDependencies`);
+    project.devDependencies[name] = spec;
+    console.log(`  Added ${name} to devDependencies`);
     changed = true;
+  }
+
+  if (project.devDependencies) {
+    project.devDependencies = sortKeys(project.devDependencies);
   }
 
   project.scripts = project.scripts || {};
   for (const [name, command] of [
     ['build:tokens', 'design-system build'],
     ['validate:tokens', 'design-system validate'],
+    ['lint:css', 'stylelint "**/*.css"'],
   ]) {
     if (project.scripts[name]) {
       console.log(`  ${name} script already exists`);

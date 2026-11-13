@@ -2,7 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { createRequire } from 'module';
 import { makeProject, runCli } from './helpers.js';
+
+const require = createRequire(import.meta.url);
 
 const PKG_NAME = '@lacrx/design-system';
 
@@ -42,6 +45,24 @@ test('wires the dependency the scaffolded config needs to resolve', () => {
 
     assert.equal(pkg.scripts['build:tokens'], 'design-system build');
     assert.equal(pkg.scripts['validate:tokens'], 'design-system validate');
+  } finally {
+    project.cleanup();
+  }
+});
+
+test('wires the lint tooling the scaffolded config needs to run', () => {
+  // stylelint and its plugin are optional peers of this package, so installing
+  // it brings neither, and `.stylelintrc.json` alone cannot lint anything.
+  const project = makeProject({ 'package.json': { name: 'demo', version: '1.0.0' } });
+  try {
+    runCli(project.dir, ['init']);
+    const dev = readJson(project.dir, 'package.json').devDependencies;
+    const peers = require('../package.json').peerDependencies;
+
+    for (const name of Object.keys(peers)) {
+      assert.ok(dev?.[name], `${name} not added to the project`);
+    }
+    assert.equal(readJson(project.dir, 'package.json').scripts['lint:css'], 'stylelint "**/*.css"');
   } finally {
     project.cleanup();
   }
