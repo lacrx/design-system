@@ -1,7 +1,8 @@
-import { existsSync, mkdirSync, readdirSync, writeFileSync, watch } from 'fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, watch } from 'fs';
 import { resolve, join, relative, sep, basename } from 'path';
 import StyleDictionary from 'style-dictionary';
 import { createConfig, registerFormats, blocksForTheme, THEMES_DIR } from './config.js';
+import { renderModules } from './js.js';
 
 /** Every .json under `dir`, split into base tokens and theme overlays. */
 export function collectSources(dir) {
@@ -42,35 +43,72 @@ export async function build(options = {}) {
 
   // The base pass carries the header; each theme appends a block to the same
   // stylesheet, so a consumer still links one file.
-  const sections = [await format({ ...options, sources: base, blocks: undefined, header: true })];
+  const basePass = await runPass({ ...options, sources: base, blocks: undefined, header: true });
+  const sections = [basePass.output];
+  const themeTokens = [];
 
   for (const theme of themes) {
-    sections.push(
-      await format({
-        ...options,
-        sources: [...base, theme.file],
-        only: theme.file,
-        blocks: blocksForTheme(theme.name),
-        header: false,
-      }),
-    );
+    const pass = await runPass({
+      ...options,
+      sources: [...base, theme.file],
+      only: theme.file,
+      blocks: blocksForTheme(theme.name),
+      header: false,
+      quiet: true,
+    });
+    sections.push(pass.output);
+    themeTokens.push(...pass.tokens);
   }
 
   const config = createConfig(options);
   const { buildPath } = config.platforms.css;
   const destination = config.platforms.css.files[0].destination;
 
+  const artifacts = [
+    { path: join(buildPath, destination), content: sections.filter(Boolean).join('\n') },
+  ];
+
+  if (options.js) {
+    const { js, dts } = renderModules(basePass.tokens, themeTokens);
+    const stem = destination.replace(/\.css$/, '');
+    artifacts.push({ path: join(buildPath, `${stem}.js`), content: js });
+    artifacts.push({ path: join(buildPath, `${stem}.d.ts`), content: dts });
+  }
+
+  if (options.check) {
+    const stale = artifacts.filter(
+      ({ path, content }) => !existsSync(path) || readFileSync(path, 'utf8') !== content,
+    );
+    if (stale.length) {
+      throw new Error(
+        `Built output is stale. Run the build and commit the result:\n` +
+          stale.map(({ path }) => `  ${path}`).join('\n'),
+      );
+    }
+    console.log(`Built output is up to date (${artifacts.length} file(s) checked).`);
+    return;
+  }
+
   mkdirSync(buildPath, { recursive: true });
-  writeFileSync(join(buildPath, destination), sections.filter(Boolean).join('\n'));
+  for (const { path, content } of artifacts) writeFileSync(path, content);
 
   const themeNote = themes.length ? ` (themes: ${themes.map((t) => t.name).join(', ')})` : '';
-  console.log('Tokens built to', buildPath + destination + themeNote);
+  const extra = artifacts.length > 1 ? ` plus ${artifacts.length - 1} module file(s)` : '';
+  console.log('Tokens built to', buildPath + destination + themeNote + extra);
 }
 
-async function format(options) {
+async function runPass(options) {
   const sd = new StyleDictionary(createConfig(options));
   const [file] = await sd.formatPlatform('css');
-  return file?.output ?? '';
+  const dictionary = await sd.getPlatformTokens('css');
+
+  // A theme pass includes the base tokens it references, so narrow to the
+  // overlay's own file the same way the CSS filter does.
+  const tokens = options.only
+    ? dictionary.allTokens.filter((token) => token.filePath === options.only)
+    : dictionary.allTokens;
+
+  return { output: file?.output ?? '', tokens };
 }
 
 /**

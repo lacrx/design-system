@@ -43,7 +43,7 @@ test('wires the dependency the scaffolded config needs to resolve', () => {
     assert.ok(pkg.devDependencies?.[PKG_NAME], 'dependency not added');
     assert.equal(readJson(project.dir, '.stylelintrc.json').extends, `${PKG_NAME}/lint/stylelint.config.cjs`);
 
-    assert.equal(pkg.scripts['build:tokens'], 'design-system build');
+    assert.equal(pkg.scripts['build:tokens'], 'design-system build --js');
     assert.equal(pkg.scripts['validate:tokens'], 'design-system validate');
   } finally {
     project.cleanup();
@@ -63,6 +63,7 @@ test('wires the lint tooling the scaffolded config needs to run', () => {
       assert.ok(dev?.[name], `${name} not added to the project`);
     }
     assert.equal(readJson(project.dir, 'package.json').scripts['lint:css'], 'stylelint "**/*.css"');
+    assert.equal(readJson(project.dir, 'package.json').scripts['contrast:tokens'], 'design-system contrast');
   } finally {
     project.cleanup();
   }

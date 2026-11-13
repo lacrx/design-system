@@ -20,6 +20,15 @@ Every rule above is enforced by `.stylelintrc.json`. If stylelint passes and a r
 - Components read the same `--bg-primary` in both themes. If a component needs to know which theme is active, the token set is wrong.
 - `data-theme="dark"` or `data-theme="light"` on `<html>` forces a theme; with neither, the OS preference wins.
 
+### Inline styles and JS
+- Component code imports tokens: `import { tokens } from './dist/tokens.js'`, then `tokens.text.primary`. Never retype a variable name as a string, and never inline a raw value.
+- `tokens.*` is a `var()` reference, so it follows the active theme. `values.*` is the base theme's resolved value and does not; use it only where a CSS variable cannot go, such as a canvas fill.
+- Stylelint cannot see inline styles. A hardcoded colour in a `style={{ }}` prop will pass lint and is still wrong.
+
+### Accessibility
+- A semantic colour pair that text sits on declares itself in `$extensions` under `com.lacrx.contrast`, and `npm run contrast:tokens` must pass before a palette change ships.
+- Contrast is checked in every theme. A palette edit that passes in light and fails in dark is the normal failure, not an edge case.
+
 ### Token files
 - Primitives: `tokens/primitives.json` (raw values, named by what they are)
 - Semantic: `tokens/semantic.json` (role-based references, named by what they do; every value must be a reference, never a literal)
