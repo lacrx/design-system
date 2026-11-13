@@ -119,3 +119,7 @@ npm test
 The suite covers the build pipeline, the CLI, the validator, the scaffold, and
 the lint config itself, including that the scaffolded project builds and
 validates without edits.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

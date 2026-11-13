@@ -2,6 +2,7 @@
   "name": "@lacrx/design-system",
   "version": "0.1.0",
   "description": "Cross-project design system: token pipeline, AI agent rules, lint enforcement",
+  "license": "MIT",
   "type": "module",
   "main": "./index.js",
   "exports": {
@@ -26,13 +27,14 @@
     "test:watch": "node --test --watch test/*.test.js"
   },
   "files": [
-    "build/",
+    "LICENSE",
+    "README.md",
     "bin/",
+    "build/",
+    "index.js",
     "lint/",
     "schema/",
-    "templates/",
-    "index.js",
-    "README.md"
+    "templates/"
   ],
   "dependencies": {
     "ajv": "^8.17.1",
