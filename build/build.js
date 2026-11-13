@@ -1,13 +1,15 @@
 import { existsSync, watch } from 'fs';
-import { resolve, join } from 'path';
+import { resolve } from 'path';
 import StyleDictionary from 'style-dictionary';
 import { createConfig } from './config.js';
 
+// These are library entry points as well as CLI ones (see index.js), so they
+// throw rather than calling process.exit. bin/cli.js turns a throw into a
+// non-zero exit.
 export async function build(options = {}) {
   const source = resolve(options.source || 'tokens');
   if (!existsSync(source)) {
-    console.error(`Token source directory not found: ${source}`);
-    process.exit(1);
+    throw new Error(`Token source directory not found: ${source}`);
   }
 
   const config = createConfig(options);
@@ -17,11 +19,14 @@ export async function build(options = {}) {
   console.log('Tokens built to', config.platforms.css.buildPath + dest);
 }
 
+/**
+ * Rebuild on token file changes. Returns the FSWatcher so a caller can stop
+ * it; an unclosed watcher keeps the process alive for ever.
+ */
 export function watchTokens(options = {}) {
   const source = resolve(options.source || 'tokens');
   if (!existsSync(source)) {
-    console.error(`Token source directory not found: ${source}`);
-    process.exit(1);
+    throw new Error(`Token source directory not found: ${source}`);
   }
 
   let debounce = null;
@@ -36,7 +41,9 @@ export function watchTokens(options = {}) {
     }, 150);
   };
 
-  watch(source, { recursive: true }, (event, filename) => {
+  // Recursive watch is only supported on Linux from Node 20, hence the engines
+  // floor in package.json.
+  const watcher = watch(source, { recursive: true }, (event, filename) => {
     if (filename && filename.endsWith('.json')) {
       console.log(`\n${filename} changed, rebuilding...`);
       rebuild();
@@ -44,4 +51,5 @@ export function watchTokens(options = {}) {
   });
 
   console.log(`Watching ${source} for changes...`);
+  return watcher;
 }
