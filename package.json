@@ -22,8 +22,8 @@
   "scripts": {
     "build": "node bin/cli.js build",
     "validate": "node bin/cli.js validate",
-    "test": "node --test \"test/*.test.js\"",
-    "test:watch": "node --test --watch \"test/*.test.js\""
+    "test": "node --test test/*.test.js",
+    "test:watch": "node --test --watch test/*.test.js"
   },
   "files": [
     "build/",
