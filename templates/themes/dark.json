@@ -1,0 +1,28 @@
+{
+  "bg": {
+    "$type": "color",
+    "primary":   { "$value": "{color.neutral.900}", "$description": "Main page background" },
+    "secondary": { "$value": "{color.neutral.700}", "$description": "Slightly offset sections" },
+    "inverse":   { "$value": "{color.neutral.0}", "$description": "Light sections against the dark page" },
+    "accent":    { "$value": "{color.brand.900}", "$description": "Highlighted areas, callouts" }
+  },
+  "text": {
+    "$type": "color",
+    "primary":   { "$value": "{color.neutral.0}", "$description": "Body text" },
+    "secondary": { "$value": "{color.neutral.200}", "$description": "Supporting text" },
+    "muted":     { "$value": "{color.neutral.300}", "$description": "Captions, placeholders" },
+    "inverse":   { "$value": "{color.neutral.900}", "$description": "Text on light surfaces" },
+    "accent":    { "$value": "{color.brand.100}", "$description": "Links, emphasis" }
+  },
+  "accent": {
+    "$type": "color",
+    "primary": { "$value": "{color.brand.500}", "$description": "Buttons, active states" },
+    "hover":   { "$value": "{color.brand.100}", "$description": "Hover state for interactive" },
+    "subtle":  { "$value": "{color.brand.900}", "$description": "Badges, tags, soft highlights" }
+  },
+  "border": {
+    "$type": "color",
+    "default": { "$value": "{color.neutral.700}", "$description": "Card borders, dividers" },
+    "strong":  { "$value": "{color.neutral.500}", "$description": "Emphasized borders" }
+  }
+}

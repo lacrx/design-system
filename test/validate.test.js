@@ -9,7 +9,7 @@ function validateTokens(files) {
     Object.fromEntries(Object.entries(files).map(([name, body]) => [join('tokens', name), body])),
   );
   try {
-    return validate({ source: join(project.dir, 'tokens') });
+    return validate({ source: join(project.dir, 'tokens') }).errors;
   } finally {
     project.cleanup();
   }
@@ -21,7 +21,13 @@ test('accepts a well-formed token set', () => {
 
 test('accepts the shipped examples', () => {
   for (const name of ['minimal', 'full']) {
-    assert.deepEqual(validate({ source: join(repoRoot, 'examples', name) }), [], `${name} example`);
+    const { errors, warnings } = validate({ source: join(repoRoot, 'examples', name) });
+    assert.deepEqual(errors, [], `${name} example`);
+    if (name === 'full') {
+      // The full example is the one that demonstrates the 2025.10 value forms,
+      // so it must be free of legacy-form warnings too.
+      assert.deepEqual(warnings, [], 'full example should use the stable value forms');
+    }
   }
 });
 
@@ -123,7 +129,7 @@ test('reports malformed JSON by file name', () => {
 });
 
 test('reports a missing source directory instead of throwing', () => {
-  const errors = validate({ source: join(repoRoot, 'no-such-directory') });
+  const { errors } = validate({ source: join(repoRoot, 'no-such-directory') });
   assert.equal(errors.length, 1);
   assert.match(errors[0], /not found/);
 });
@@ -131,9 +137,65 @@ test('reports a missing source directory instead of throwing', () => {
 test('reports an empty source directory', () => {
   const project = makeProject({ 'tokens/.keep': '' });
   try {
-    const errors = validate({ source: join(project.dir, 'tokens') });
+    const { errors } = validate({ source: join(project.dir, 'tokens') });
     assert.equal(errors.length, 1);
     assert.match(errors[0], /No \.json token files/);
+  } finally {
+    project.cleanup();
+  }
+});
+
+test('checks values against their $type', () => {
+  const errors = validateTokens({
+    'primitives.json': { color: { $type: 'color', bad: { $value: 'potato' } } },
+  });
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /expected a hex color/);
+});
+
+test('accepts the stable 2025.10 value forms', () => {
+  assert.deepEqual(
+    validateTokens({
+      'primitives.json': {
+        color: { $type: 'color', blue: { $value: { colorSpace: 'srgb', components: [0.2, 0.4, 0.8], hex: '#3366CC' } } },
+        space: { $type: 'dimension', md: { $value: { value: 16, unit: 'px' } } },
+        quick: { $type: 'duration', fast: { $value: { value: 200, unit: 'ms' } } },
+        weight: { $type: 'fontWeight', bold: { $value: 700 } },
+        stack: { $type: 'fontFamily', body: { $value: ['Inter', 'system-ui'] } },
+        ease: { $type: 'cubicBezier', out: { $value: [0.4, 0, 0.2, 1] } },
+      },
+    }),
+    [],
+  );
+});
+
+test('rejects values that break the spec rules for their type', () => {
+  const cases = [
+    [{ color: { $type: 'color', x: { $value: { colorSpace: 'bogus', components: [1, 1, 1] } } } }, /unknown colorSpace/],
+    [{ space: { $type: 'dimension', x: { $value: { value: 16, unit: 'em' } } } }, /unit must be/],
+    [{ weight: { $type: 'fontWeight', x: { $value: 1200 } } }, /between 1 and 1000/],
+    [{ ease: { $type: 'cubicBezier', x: { $value: [2, 0, 0.2, 1] } } }, /x values/],
+    [{ n: { $type: 'number', x: { $value: 'three' } } }, /expected a number/],
+  ];
+  for (const [tokens, pattern] of cases) {
+    const errors = validateTokens({ 'primitives.json': tokens });
+    assert.equal(errors.length, 1, JSON.stringify(tokens));
+    assert.match(errors[0], pattern);
+  }
+});
+
+test('reports legacy value forms as warnings, not errors', () => {
+  const project = makeProject({
+    'tokens/primitives.json': JSON.stringify({
+      color: { $type: 'color', blue: { $value: '#3366CC' } },
+      space: { $type: 'dimension', md: { $value: '16px' } },
+    }),
+  });
+  try {
+    const { errors, warnings } = validate({ source: join(project.dir, 'tokens') });
+    assert.deepEqual(errors, []);
+    assert.equal(warnings.length, 2);
+    assert.match(warnings.join('\n'), /2025\.10 form/);
   } finally {
     project.cleanup();
   }

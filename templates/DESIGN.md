@@ -16,6 +16,10 @@ built: "./dist/tokens.css"
 
 <!-- Name the typeface pairing and why. Describe the hierarchy: which face for headlines, body, data. -->
 
+# Themes
+
+<!-- Which themes exist and what changes between them. Dark mode is on by default via tokens/themes/dark.json; describe its intent, not its hex values. -->
+
 # Spacing
 
 <!-- Describe the spacing philosophy: tight or airy? Which scale steps for section gaps, card padding, element margins? Reference --space-* tokens by name. -->
