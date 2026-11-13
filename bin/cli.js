@@ -5,7 +5,12 @@ const args = process.argv.slice(3);
 
 function parseFlags(args) {
   const flags = {};
-  const takesValue = { '--source': 'source', '--output': 'output', '--filename': 'filename' };
+  const takesValue = {
+    '--source': 'source',
+    '--output': 'output',
+    '--filename': 'filename',
+    '--level': 'level',
+  };
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -17,6 +22,16 @@ function parseFlags(args) {
 
     if (arg === '--strict') {
       flags.strict = true;
+      continue;
+    }
+
+    if (arg === '--js') {
+      flags.js = true;
+      continue;
+    }
+
+    if (arg === '--check') {
+      flags.check = true;
       continue;
     }
 
@@ -45,10 +60,15 @@ function usage() {
   console.log('    --source <dir>    Token source directory (default: tokens)');
   console.log('    --output <dir>    Output directory (default: dist)');
   console.log('    --filename <name> Output filename (default: tokens.css)');
+  console.log('    --js              Also emit tokens.js and tokens.d.ts');
+  console.log('    --check           Fail if the built output is stale; write nothing');
   console.log('    --watch, -w       Rebuild on token file changes');
   console.log('  validate            Check token files for schema, value and reference errors');
   console.log('    --source <dir>    Token source directory (default: tokens)');
   console.log('    --strict          Also fail on pre-2025.10 value forms');
+  console.log('  contrast            Check declared colour pairs against WCAG 2.1');
+  console.log('    --source <dir>    Token source directory (default: tokens)');
+  console.log('    --level <AA|AAA>  Override the level each pair declares');
 }
 
 try {
@@ -69,6 +89,12 @@ try {
       const flags = parseFlags(args);
       const { runValidate } = await import('../schema/validate.js');
       process.exitCode = runValidate(flags);
+      break;
+    }
+    case 'contrast': {
+      const flags = parseFlags(args);
+      const { runContrast } = await import('../schema/contrast.js');
+      process.exitCode = runContrast(flags);
       break;
     }
     case 'help':

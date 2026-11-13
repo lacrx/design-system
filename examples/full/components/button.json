@@ -1,0 +1,20 @@
+{
+  "button": {
+    "bg": {
+      "$type": "color",
+      "default": { "$value": "{accent.primary}", "$description": "Resting fill" },
+      "hover":   { "$value": "{accent.hover}", "$description": "Pointer over the button" },
+      "subtle":  { "$value": "{accent.subtle}", "$description": "Secondary button fill" }
+    },
+    "text": {
+      "$type": "color",
+      "default": { "$value": "{text.inverse}", "$description": "Label on the resting fill" }
+    },
+    "radius":  { "$type": "dimension", "default": { "$value": "{radius.md}" } },
+    "padding": {
+      "$type": "dimension",
+      "x": { "$value": "{space.lg}" },
+      "y": { "$value": "{space.sm}" }
+    }
+  }
+}

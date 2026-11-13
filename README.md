@@ -25,6 +25,7 @@ npx design-system init     # scaffold tokens, DESIGN.md, lint config, scripts
 npm install                # pull in the dependency init just added
 npm run build:tokens       # tokens/ -> dist/tokens.css
 npm run lint:css           # fail on any hardcoded visual value
+npm run contrast:tokens    # fail on a colour pair that misses WCAG AA
 ```
 
 `init` never overwrites a file that already exists, so it is safe to re-run
@@ -37,11 +38,13 @@ after the package is updated.
 | `design-system init` | Scaffold `tokens/`, `DESIGN.md`, `.stylelintrc.json`, CLAUDE.md rules, and the `build:tokens` / `validate:tokens` / `lint:css` scripts. Adds itself, Stylelint and the Stylelint plugin to `devDependencies`. |
 | `design-system build` | Compile every token file to CSS custom properties. |
 | `design-system validate` | Check token files against the schema, check each value against its `$type`, and resolve every reference. |
+| `design-system contrast` | Check declared colour pairs against WCAG 2.1, in every theme. |
 
 Both `build` and `validate` take `--source <dir>` (default `tokens`). `build`
 also takes `--output <dir>` (default `dist`), `--filename <name>` (default
-`tokens.css`) and `--watch`. `validate` takes `--strict`, which also fails on
-pre-2025.10 value forms.
+`tokens.css`), `--watch`, `--js` and `--check`. `validate` takes `--strict`,
+which also fails on pre-2025.10 value forms. `contrast` takes `--level AA|AAA`
+to override what each pair declares.
 
 Unknown flags are an error rather than being silently ignored.
 
@@ -117,6 +120,71 @@ the `[data-theme="<name>"]` block, because the browser has no signal for it.
 
 A theme block contains only the tokens that theme overrides, and they stay as
 `var()` references, so the primitives are never duplicated.
+
+## Using tokens from JavaScript
+
+`build --js` also emits `tokens.js` and `tokens.d.ts`, which is what `init`
+wires into `build:tokens`. The lint config can only police stylesheets, so
+without this nothing stops `style={{ color: '#fff' }}` in a component.
+
+```js
+import { tokens } from './dist/tokens.js';
+
+<div style={{ color: tokens.text.primary, padding: tokens.space.md }} />
+// -> color: var(--text-primary); padding: var(--space-md)
+```
+
+Every leaf is a `var()` reference, not a resolved value, so the browser
+resolves it and a themed page just works. Types are literal, so a renamed
+token is a type error rather than a variable that silently resolves to
+nothing.
+
+The module also exports `values`, the resolved values of the base theme, for
+the places a CSS variable cannot reach: a canvas fill, a
+`<meta name="theme-color">`. It is not theme-aware, and the generated file says
+so.
+
+## Checking contrast
+
+A semantic colour token declares what it is meant to sit on:
+
+```json
+"text": {
+  "$type": "color",
+  "muted": {
+    "$value": "{color.neutral.500}",
+    "$extensions": { "com.lacrx.contrast": { "on": ["bg.primary"], "level": "AA" } }
+  }
+}
+```
+
+`design-system contrast` then measures every pair in the base theme and again
+in each theme overlay, which is where a palette edit usually breaks contrast
+without anyone noticing:
+
+```
+ok   base: text.muted on bg.primary: 4.87:1 (AA normal needs 4.5:1)
+FAIL dark: text.muted on bg.primary: 2.82:1 (AA normal needs 4.5:1)
+```
+
+`level` is `AA` (default) or `AAA`, `size` is `normal` (default) or `large`.
+Thresholds follow WCAG 2.1: 4.5, 3, 7 and 4.5 respectively.
+
+Colours outside sRGB are measured through their `hex` fallback, and skipped
+with a note when there is none. A translucent colour is skipped too, because
+its real contrast depends on what sits behind it, and a number there would be
+a guess.
+
+Those two lines above are real: the example palette in this repo failed AA on
+`text.muted` in both themes when the checker was first run, and its `warm`
+ramp had step 900 lighter than step 800. Both are fixed.
+
+## Keeping the build honest
+
+`build --check` rebuilds in memory, compares against what is on disk, writes
+nothing, and exits non-zero if they differ. For a project that commits its
+`dist/`, that is the CI guard against a token edit landing without its
+rebuilt output.
 
 ## What `validate` catches
 

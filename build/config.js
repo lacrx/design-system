@@ -85,10 +85,19 @@ export function createConfig({
   only,
   blocks,
   header = true,
+  quiet = false,
 } = {}) {
   return {
     source: sources ?? [`${source}/**/*.json`],
-    log: { verbosity: 'default', warnings: 'warn' },
+    // A theme pass deliberately redefines the roles it overrides and
+    // deliberately filters the primitives it references out of its own output,
+    // so Style Dictionary reports a collision and a filtered-reference warning
+    // for every single override. Both are structural to composing one
+    // stylesheet from several passes, and both are already covered properly by
+    // `design-system validate`, which reports a token defined twice inside one
+    // theme and a reference that resolves to nothing. The base pass keeps its
+    // warnings.
+    log: { verbosity: 'default', warnings: quiet ? 'disabled' : 'warn' },
     platforms: {
       css: {
         transformGroup: 'css',

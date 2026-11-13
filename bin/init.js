@@ -59,6 +59,7 @@ export async function init() {
   console.log(`  ${step++}. Fill in DESIGN.md with your visual direction`);
   console.log(`  ${step++}. Run: npm run build:tokens`);
   console.log(`  ${step++}. Run: npm run lint:css`);
+  console.log(`  ${step++}. Run: npm run contrast:tokens`);
 }
 
 function copyTemplate(name, dest, label = name) {
@@ -121,8 +122,9 @@ function updatePackageJson() {
 
   project.scripts = project.scripts || {};
   for (const [name, command] of [
-    ['build:tokens', 'design-system build'],
+    ['build:tokens', 'design-system build --js'],
     ['validate:tokens', 'design-system validate'],
+    ['contrast:tokens', 'design-system contrast'],
     ['lint:css', 'stylelint "**/*.css"'],
   ]) {
     if (project.scripts[name]) {

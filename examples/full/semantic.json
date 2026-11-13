@@ -1,28 +1,111 @@
 {
   "bg": {
     "$type": "color",
-    "primary":   { "$value": "{color.warm.100}", "$description": "Main page background" },
-    "secondary": { "$value": "{color.warm.50}", "$description": "Card surfaces" },
-    "inverse":   { "$value": "{color.warm.800}", "$description": "Dark sections" },
-    "accent":    { "$value": "{color.warm.200}", "$description": "Highlights, callouts" }
+    "primary": {
+      "$value": "{color.warm.100}",
+      "$description": "Main page background"
+    },
+    "secondary": {
+      "$value": "{color.warm.50}",
+      "$description": "Card surfaces"
+    },
+    "inverse": {
+      "$value": "{color.warm.800}",
+      "$description": "Dark sections"
+    },
+    "accent": {
+      "$value": "{color.warm.200}",
+      "$description": "Highlights, callouts"
+    }
   },
   "text": {
     "$type": "color",
-    "primary":   { "$value": "{color.warm.800}", "$description": "Body text" },
-    "secondary": { "$value": "{color.warm.900}", "$description": "Headings, emphasis" },
-    "muted":     { "$value": "{color.neutral.500}", "$description": "Captions" },
-    "inverse":   { "$value": "{color.warm.100}", "$description": "Text on dark surfaces" },
-    "accent":    { "$value": "{color.warm.900}", "$description": "Links" }
+    "primary": {
+      "$value": "{color.warm.800}",
+      "$description": "Body text",
+      "$extensions": {
+        "com.lacrx.contrast": {
+          "on": [
+            "bg.primary",
+            "bg.secondary"
+          ],
+          "level": "AA"
+        }
+      }
+    },
+    "secondary": {
+      "$value": "{color.warm.900}",
+      "$description": "Headings, emphasis",
+      "$extensions": {
+        "com.lacrx.contrast": {
+          "on": [
+            "bg.primary"
+          ],
+          "level": "AA"
+        }
+      }
+    },
+    "muted": {
+      "$value": "{color.neutral.500}",
+      "$description": "Captions",
+      "$extensions": {
+        "com.lacrx.contrast": {
+          "on": [
+            "bg.primary"
+          ],
+          "level": "AA"
+        }
+      }
+    },
+    "inverse": {
+      "$value": "{color.warm.100}",
+      "$description": "Text on dark surfaces",
+      "$extensions": {
+        "com.lacrx.contrast": {
+          "on": [
+            "bg.inverse"
+          ],
+          "level": "AA"
+        }
+      }
+    },
+    "accent": {
+      "$value": "{color.warm.900}",
+      "$description": "Links",
+      "$extensions": {
+        "com.lacrx.contrast": {
+          "on": [
+            "bg.primary"
+          ],
+          "level": "AA"
+        }
+      }
+    }
   },
   "accent": {
     "$type": "color",
-    "primary":   { "$value": "{color.warm.900}", "$description": "Buttons" },
-    "hover":     { "$value": "{color.warm.800}", "$description": "Button hover" },
-    "subtle":    { "$value": "{color.warm.200}", "$description": "Tags, soft highlights" }
+    "primary": {
+      "$value": "{color.warm.900}",
+      "$description": "Buttons"
+    },
+    "hover": {
+      "$value": "{color.warm.800}",
+      "$description": "Button hover"
+    },
+    "subtle": {
+      "$value": "{color.warm.200}",
+      "$description": "Tags, soft highlights"
+    }
   },
   "border": {
     "$type": "color",
-    "default":   { "$value": "{color.neutral.200}", "$description": "Dividers" },
-    "strong":    { "$value": "{color.neutral.300}", "$description": "Emphasized borders" }
+    "default": {
+      "$value": "{color.neutral.200}",
+      "$description": "Dividers"
+    },
+    "strong": {
+      "$value": "{color.neutral.300}",
+      "$description": "Emphasized borders"
+    }
   }
 }
