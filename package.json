@@ -1,6 +1,6 @@
 {
   "name": "@lacrx/design-system",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Cross-project design system: token pipeline, AI agent rules, lint enforcement",
   "license": "MIT",
   "type": "module",

@@ -12,8 +12,18 @@ const pkg = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'));
 // The package is not on npm, so a consuming project installs it straight from
 // GitHub. Without this entry the scaffolded .stylelintrc.json cannot resolve
 // its `extends` target and the build scripts have no binary to run.
+//
+// This is the tag's tarball rather than `github:lacrx/design-system` for two
+// reasons, both measured:
+//   1. The bare form has no ref, so a fresh install with no lockfile takes
+//      whatever the default branch happens to be at that moment.
+//   2. npm writes `git+ssh://git@github.com/...` into the lockfile for the
+//      `github:` shorthand, even when asked for https, so `npm ci` then needs
+//      SSH access to a public repo. A tarball URL is recorded verbatim and
+//      needs no git at all.
+// Bump this with the version in package.json, and tag the merge commit.
 const PACKAGE_NAME = pkg.name;
-const PACKAGE_SPEC = 'github:lacrx/design-system';
+const PACKAGE_SPEC = `https://github.com/lacrx/design-system/archive/refs/tags/v${pkg.version}.tar.gz`;
 
 // Stylelint and its plugin are optional peers of this package, so installing
 // it brings neither. The scaffolded .stylelintrc.json is useless without them,
