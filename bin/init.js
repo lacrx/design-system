@@ -36,6 +36,10 @@ export async function init() {
 
   copyTemplate('primitives.json', join(tokensDir, 'primitives.json'));
   copyTemplate('semantic.json', join(tokensDir, 'semantic.json'));
+
+  const themesDir = join(tokensDir, 'themes');
+  if (!existsSync(themesDir)) mkdirSync(themesDir, { recursive: true });
+  copyTemplate(join('themes', 'dark.json'), join(themesDir, 'dark.json'), 'themes/dark.json');
   copyTemplate('DESIGN.md', join(cwd, 'DESIGN.md'));
   copyTemplate('stylelintrc.json', join(cwd, '.stylelintrc.json'), '.stylelintrc.json');
 

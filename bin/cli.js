@@ -15,6 +15,11 @@ function parseFlags(args) {
       continue;
     }
 
+    if (arg === '--strict') {
+      flags.strict = true;
+      continue;
+    }
+
     if (arg in takesValue) {
       const value = args[i + 1];
       if (value === undefined || value.startsWith('-')) {
@@ -41,8 +46,9 @@ function usage() {
   console.log('    --output <dir>    Output directory (default: dist)');
   console.log('    --filename <name> Output filename (default: tokens.css)');
   console.log('    --watch, -w       Rebuild on token file changes');
-  console.log('  validate            Check token files for schema and reference errors');
+  console.log('  validate            Check token files for schema, value and reference errors');
   console.log('    --source <dir>    Token source directory (default: tokens)');
+  console.log('    --strict          Also fail on pre-2025.10 value forms');
 }
 
 try {
