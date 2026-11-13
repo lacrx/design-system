@@ -24,6 +24,7 @@ Linux only supports from Node 20.
 npx design-system init     # scaffold tokens, DESIGN.md, lint config, scripts
 npm install                # pull in the dependency init just added
 npm run build:tokens       # tokens/ -> dist/tokens.css
+npm run lint:css           # fail on any hardcoded visual value
 ```
 
 `init` never overwrites a file that already exists, so it is safe to re-run
@@ -33,7 +34,7 @@ after the package is updated.
 
 | Command | What it does |
 | --- | --- |
-| `design-system init` | Scaffold `tokens/`, `DESIGN.md`, `.stylelintrc.json`, CLAUDE.md rules, and the `build:tokens` / `validate:tokens` scripts. Adds itself to `devDependencies`. |
+| `design-system init` | Scaffold `tokens/`, `DESIGN.md`, `.stylelintrc.json`, CLAUDE.md rules, and the `build:tokens` / `validate:tokens` / `lint:css` scripts. Adds itself, Stylelint and the Stylelint plugin to `devDependencies`. |
 | `design-system build` | Compile every token file to CSS custom properties. |
 | `design-system validate` | Check token files against the schema and resolve every reference. |
 
@@ -82,8 +83,11 @@ token set cannot reach `dist/`.
 
 ## Lint
 
-`init` writes a `.stylelintrc.json` that extends the shared config. It forces
-colour, spacing, radius and type values through CSS custom properties:
+`init` writes a `.stylelintrc.json` that extends the shared config, and adds
+Stylelint and `stylelint-declaration-strict-value` to the project. They are
+optional peers here, so installing this package alone brings neither and the
+config would have nothing to run in. The rules force colour, spacing, radius
+and type values through CSS custom properties:
 
 ```css
 /* rejected */

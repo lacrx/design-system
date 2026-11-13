@@ -27,6 +27,9 @@ W3C DTCG (Design Tokens Community Group) JSON with `$value`, `$type`, `$descript
 - `build/` and `schema/` are exported as library APIs via `index.js`, so they throw; only `bin/cli.js` sets an exit code.
 - The lint property list and `templates/claude-md-design.md` are two halves of one contract. Change one, change the other, and cover it in `test/lint.test.js`.
 
+## Peer dependencies
+Stylelint and `stylelint-declaration-strict-value` are optional peers, so a consumer installing this package gets neither. `bin/init.js` adds them to the consuming project itself, with ranges derived from our own `peerDependencies`, so a scaffolded project can lint without anything installed by hand. `test/init.test.js` asserts every peer is wired.
+
 ## Not on npm
 Installed from GitHub (`github:lacrx/design-system`). `bin/init.js` writes that spec into the consuming project's devDependencies; if the package is ever published, change `PACKAGE_SPEC` there.
 
