@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lacrx/design-system/schema/tokens.schema.json",
+  "title": "DTCG token file",
+  "description": "Structural schema for a W3C Design Tokens Community Group token file. Cross-file concerns (reference resolution, type inheritance) are checked procedurally in validate.js, because JSON Schema cannot resolve a {group.token} alias.",
+  "type": "object",
+  "$defs": {
+    "type": {
+      "enum": [
+        "color",
+        "dimension",
+        "fontFamily",
+        "fontWeight",
+        "duration",
+        "cubicBezier",
+        "number",
+        "strokeStyle",
+        "border",
+        "transition",
+        "shadow",
+        "gradient",
+        "typography"
+      ]
+    },
+    "token": {
+      "type": "object",
+      "required": ["$value"],
+      "properties": {
+        "$value": {
+          "description": "A literal value, a {group.token} reference, or a composite object or array.",
+          "not": { "type": "null" }
+        },
+        "$type": { "$ref": "#/$defs/type" },
+        "$description": { "type": "string" },
+        "$extensions": { "type": "object" },
+        "$deprecated": { "type": ["boolean", "string"] }
+      },
+      "additionalProperties": false
+    },
+    "group": {
+      "type": "object",
+      "properties": {
+        "$type": { "$ref": "#/$defs/type" },
+        "$description": { "type": "string" },
+        "$extensions": { "type": "object" },
+        "$deprecated": { "type": ["boolean", "string"] }
+      },
+      "patternProperties": {
+        "^[^$]": {
+          "oneOf": [{ "$ref": "#/$defs/token" }, { "$ref": "#/$defs/group" }]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [{ "$ref": "#/$defs/group" }]
+}

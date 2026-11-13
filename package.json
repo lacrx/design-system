@@ -10,7 +10,7 @@
     "./build/*": "./build/*"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "repository": {
     "type": "git",
@@ -20,8 +20,10 @@
     "design-system": "./bin/cli.js"
   },
   "scripts": {
-    "build": "node build/build.js",
-    "validate": "node schema/validate.js"
+    "build": "node bin/cli.js build",
+    "validate": "node bin/cli.js validate",
+    "test": "node --test \"test/*.test.js\"",
+    "test:watch": "node --test --watch \"test/*.test.js\""
   },
   "files": [
     "build/",
@@ -29,9 +31,11 @@
     "lint/",
     "schema/",
     "templates/",
-    "index.js"
+    "index.js",
+    "README.md"
   ],
   "dependencies": {
+    "ajv": "^8.17.1",
     "style-dictionary": "^4.2.0"
   },
   "peerDependencies": {
@@ -39,7 +43,15 @@
     "stylelint-declaration-strict-value": ">=1.10.0"
   },
   "peerDependenciesMeta": {
-    "stylelint": { "optional": true },
-    "stylelint-declaration-strict-value": { "optional": true }
+    "stylelint": {
+      "optional": true
+    },
+    "stylelint-declaration-strict-value": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "stylelint": "^16.10.0",
+    "stylelint-declaration-strict-value": "^1.10.11"
   }
 }

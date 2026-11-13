@@ -4,7 +4,16 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const templatesDir = join(__dirname, '..', 'templates');
+const packageDir = join(__dirname, '..');
 const cwd = process.cwd();
+
+const pkg = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8'));
+
+// The package is not on npm, so a consuming project installs it straight from
+// GitHub. Without this entry the scaffolded .stylelintrc.json cannot resolve
+// its `extends` target and the build scripts have no binary to run.
+const PACKAGE_NAME = pkg.name;
+const PACKAGE_SPEC = 'github:lacrx/design-system';
 
 export async function init() {
   console.log('Initializing design system...\n');
@@ -17,33 +26,32 @@ export async function init() {
   copyTemplate('primitives.json', join(tokensDir, 'primitives.json'));
   copyTemplate('semantic.json', join(tokensDir, 'semantic.json'));
   copyTemplate('DESIGN.md', join(cwd, 'DESIGN.md'));
-
-  const stylelintPath = join(cwd, '.stylelintrc.json');
-  if (!existsSync(stylelintPath)) {
-    copyTemplate('stylelintrc.json', stylelintPath);
-    console.log('  Created .stylelintrc.json');
-  } else {
-    console.log('  Skipping .stylelintrc.json (already exists)');
-  }
+  copyTemplate('stylelintrc.json', join(cwd, '.stylelintrc.json'), '.stylelintrc.json');
 
   appendDesignRules();
-  addBuildScript();
+  const wired = updatePackageJson();
 
   console.log('\nDone. Next steps:');
-  console.log('  1. Edit tokens/primitives.json with your color palette');
-  console.log('  2. Edit tokens/semantic.json to map roles to primitives');
-  console.log('  3. Fill in DESIGN.md with your visual direction');
-  console.log('  4. Run: npx @lacrx/design-system build');
+  let step = 1;
+  if (wired) {
+    console.log(`  ${step++}. Run: npm install    (pulls in ${PACKAGE_NAME})`);
+  } else {
+    console.log(`  ${step++}. Run: npm install --save-dev ${PACKAGE_SPEC}`);
+  }
+  console.log(`  ${step++}. Edit tokens/primitives.json with your color palette`);
+  console.log(`  ${step++}. Edit tokens/semantic.json to map roles to primitives`);
+  console.log(`  ${step++}. Fill in DESIGN.md with your visual direction`);
+  console.log(`  ${step++}. Run: npm run build:tokens`);
 }
 
-function copyTemplate(name, dest) {
+function copyTemplate(name, dest, label = name) {
   if (existsSync(dest)) {
-    console.log(`  Skipping ${name} (already exists)`);
+    console.log(`  Skipping ${label} (already exists)`);
     return;
   }
   const src = join(templatesDir, name);
   writeFileSync(dest, readFileSync(src, 'utf8'));
-  console.log(`  Created ${name}`);
+  console.log(`  Created ${label}`);
 }
 
 function appendDesignRules() {
@@ -65,22 +73,53 @@ function appendDesignRules() {
   }
 }
 
-function addBuildScript() {
+/**
+ * Add the dependency and the scripts that use it. Returns false when there is
+ * no package.json to wire, so init() can tell the user to install by hand.
+ */
+function updatePackageJson() {
   const pkgPath = join(cwd, 'package.json');
   if (!existsSync(pkgPath)) {
-    console.log('  No package.json found, skipping build script');
-    return;
+    console.log('  No package.json found, skipping dependency and scripts');
+    return false;
   }
 
-  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-  if (!pkg.scripts) pkg.scripts = {};
+  const project = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  let changed = false;
 
-  if (pkg.scripts['build:tokens']) {
-    console.log('  build:tokens script already exists');
-    return;
+  const installed =
+    project.dependencies?.[PACKAGE_NAME] || project.devDependencies?.[PACKAGE_NAME];
+
+  if (installed) {
+    console.log(`  ${PACKAGE_NAME} already a dependency`);
+  } else {
+    project.devDependencies = project.devDependencies || {};
+    project.devDependencies[PACKAGE_NAME] = PACKAGE_SPEC;
+    project.devDependencies = sortKeys(project.devDependencies);
+    console.log(`  Added ${PACKAGE_NAME} to devDependencies`);
+    changed = true;
   }
 
-  pkg.scripts['build:tokens'] = 'npx design-system build';
-  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-  console.log('  Added build:tokens script to package.json');
+  project.scripts = project.scripts || {};
+  for (const [name, command] of [
+    ['build:tokens', 'design-system build'],
+    ['validate:tokens', 'design-system validate'],
+  ]) {
+    if (project.scripts[name]) {
+      console.log(`  ${name} script already exists`);
+      continue;
+    }
+    project.scripts[name] = command;
+    console.log(`  Added ${name} script to package.json`);
+    changed = true;
+  }
+
+  if (changed) {
+    writeFileSync(pkgPath, JSON.stringify(project, null, 2) + '\n');
+  }
+  return true;
+}
+
+function sortKeys(obj) {
+  return Object.fromEntries(Object.entries(obj).sort(([a], [b]) => a.localeCompare(b)));
 }

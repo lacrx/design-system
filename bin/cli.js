@@ -5,13 +5,44 @@ const args = process.argv.slice(3);
 
 function parseFlags(args) {
   const flags = {};
+  const takesValue = { '--source': 'source', '--output': 'output', '--filename': 'filename' };
+
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--source' && args[i + 1]) flags.source = args[++i];
-    if (args[i] === '--output' && args[i + 1]) flags.output = args[++i];
-    if (args[i] === '--filename' && args[i + 1]) flags.filename = args[++i];
-    if (args[i] === '--watch' || args[i] === '-w') flags.watch = true;
+    const arg = args[i];
+
+    if (arg === '--watch' || arg === '-w') {
+      flags.watch = true;
+      continue;
+    }
+
+    if (arg in takesValue) {
+      const value = args[i + 1];
+      if (value === undefined || value.startsWith('-')) {
+        throw new Error(`${arg} requires a value`);
+      }
+      flags[takesValue[arg]] = value;
+      i++;
+      continue;
+    }
+
+    throw new Error(`Unknown option: ${arg}`);
   }
+
   return flags;
+}
+
+function usage() {
+  console.log('Usage: design-system <command>');
+  console.log('');
+  console.log('Commands:');
+  console.log('  init                Scaffold tokens, DESIGN.md, and lint config');
+  console.log('  build               Compile tokens to CSS custom properties');
+  console.log('    --source <dir>    Token source directory (default: tokens)');
+  console.log('    --output <dir>    Output directory (default: dist)');
+  console.log('    --filename <name> Output filename (default: tokens.css)');
+  console.log('    --watch, -w       Rebuild on token file changes');
+  console.log('  validate            Check token files for schema and reference errors');
+  console.log('    --source <dir>    Token source directory (default: tokens)');
 }
 
 try {
@@ -29,20 +60,20 @@ try {
       break;
     }
     case 'validate': {
-      await import('../schema/validate.js');
+      const flags = parseFlags(args);
+      const { runValidate } = await import('../schema/validate.js');
+      process.exitCode = runValidate(flags);
       break;
     }
+    case 'help':
+    case '--help':
+    case '-h':
+      usage();
+      break;
     default:
-      console.log('Usage: design-system <command>');
-      console.log('');
-      console.log('Commands:');
-      console.log('  init                Scaffold tokens, DESIGN.md, and lint config');
-      console.log('  build               Compile tokens to CSS custom properties');
-      console.log('    --source <dir>    Token source directory (default: tokens)');
-      console.log('    --output <dir>    Output directory (default: dist)');
-      console.log('    --filename <name> Output filename (default: tokens.css)');
-      console.log('    --watch, -w       Rebuild on token file changes');
-      console.log('  validate            Check token files for schema errors');
+      if (command) console.error(`Unknown command: ${command}\n`);
+      usage();
+      process.exitCode = command ? 1 : 0;
       break;
   }
 } catch (err) {
